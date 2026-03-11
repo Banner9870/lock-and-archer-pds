@@ -27,7 +27,7 @@ PDS needs persistent storage for accounts, repo data, and blobs. The Dockerfile 
 
 1. Open the service → **Settings** → **Networking**.
 2. Click **Generate Domain** (e.g. `lock-and-archer-pds.up.railway.app`).
-3. Set the service port to **3000** if Railway doesn’t auto-detect it (or whatever port your Dockerfile exposes).
+3. Set the **service port to match Railway’s `PORT`** — Railway usually injects `PORT=8080`, so set the port to **8080** (not 3000). The entrypoint uses `PORT` for the PDS; if the proxy target port doesn’t match, you’ll get 502 Bad Gateway.
 
 ### 4. Set environment variables
 

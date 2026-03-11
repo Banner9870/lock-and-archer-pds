@@ -11,10 +11,9 @@ COPY entrypoint.sh /app/entrypoint.sh
 COPY seed-accounts.sh /app/seed-accounts.sh
 RUN chmod +x /app/entrypoint.sh /app/seed-accounts.sh
 
-# PDS data directory (Railway volume will mount here)
+# PDS data directory (attach a Railway volume at /pds in the service settings)
 ENV PDS_DATA_DIRECTORY=/pds
 ENV PDS_PORT=3000
-VOLUME /pds
 
 # Railway sets PORT; PDS uses PDS_PORT
 EXPOSE 3000

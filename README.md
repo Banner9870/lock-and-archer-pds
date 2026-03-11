@@ -35,10 +35,16 @@ In the service **Variables** tab, set:
 
 | Variable | How to get it |
 |----------|----------------|
-| `PDS_HOSTNAME` | Your Railway domain **with `https://`**, e.g. `https://lock-and-archer-pds.up.railway.app` (no trailing slash). |
-| `PDS_JWT_SECRET` | `openssl rand --hex 16` |
-| `PDS_ADMIN_PASSWORD` | `openssl rand --hex 16` (save it; you need it for goat and for re-running seed). |
+| `PDS_HOSTNAME` | Your Railway domain **hostname only** — **no `https://`**, no trailing slash. Example: `lock-and-archer-pds.up.railway.app` |
+| `PDS_JWT_SECRET` | `openssl rand -hex 16` |
+| `PDS_ADMIN_PASSWORD` | `openssl rand -hex 16` (save it; you need it for goat and for re-running seed). |
 | `PDS_PLC_ROTATION_KEY_K256_PRIVATE_KEY_HEX` | Run: `openssl ecparam -name secp256k1 -genkey -noout -outform DER \| tail -c +8 \| head -c 32 \| xxd -p -c 32` |
+
+**PDS_HOSTNAME rules (required or the app will crash with ZodError):**
+
+- Use **hostname only** — e.g. `lock-and-archer-pds-production.up.railway.app`. **Do not** include `https://` or any path; the PDS builds the issuer URL from this and full URLs cause "Domain name must contain at least two segments" and "Issuer URL must be in the canonical form".
+- **No trailing slash** — if it ends with `/`, the PDS will error.
+- The hostname must have at least two segments (e.g. `something.up.railway.app`). Use Railway’s generated domain (e.g. `your-service.up.railway.app`) or a custom domain like `pds.yourdomain.com`.
 
 **Optional:** Copy `.env.example` to `.env` and fill values for local runs.
 
@@ -62,10 +68,30 @@ If seed ran successfully, you’ll have (password for all: **`testpass123`**):
 
 Use these handles in your Lock and Archer app (Statusphere) login. No email verification is required for local/testing use unless you configure SMTP.
 
+**Important:** The handle must match your **actual** `PDS_HOSTNAME`. If your Railway domain is `lock-and-archer-pds-production.up.railway.app`, use `alice.lock-and-archer-pds-production.up.railway.app`, not `alice.lock-and-archer-pds.up.railway.app`.
+
+## Troubleshooting: "Failed to resolve identity"
+
+If the Lock and Archer app shows **"Failed to resolve identity: alice.…"** when you log in:
+
+1. **Use the handle that matches your PDS hostname**  
+   Handles are `alice.${PDS_HOSTNAME}`, `bob.${PDS_HOSTNAME}`, etc. If `PDS_HOSTNAME` in Railway is `lock-and-archer-pds-production.up.railway.app`, then the correct handle is **`alice.lock-and-archer-pds-production.up.railway.app`** (not a different subdomain like `lock-and-archer-pds.up.railway.app`).
+
+2. **Check that the PDS is up**  
+   Open: `https://<your-pds-hostname>/xrpc/_health`  
+   You should see JSON like `{"version":"0.4.0"}`. If not, the service may still be starting or the domain is wrong.
+
+3. **Check that the test accounts were created**  
+   - In Railway, ensure `PDS_HOSTNAME` and `PDS_ADMIN_PASSWORD` were set **before** the first deploy (so the entrypoint could run the seed).
+   - If the volume was created without those variables, the seed was skipped. Either remove the volume and redeploy (to re-run the seed) or create accounts manually with [goat](https://github.com/bluesky-social/goat) (see "Recreating test accounts" below).
+   - To confirm a handle exists, open: `https://<handle>/.well-known/atproto-did`  
+     Example: `https://alice.lock-and-archer-pds-production.up.railway.app/.well-known/atproto-did`  
+     If the account exists, you get a plain-text DID (e.g. `did:plc:...`). If you get 404 or connection errors, the account wasn’t created or the hostname doesn’t match.
+
 ## Using this PDS from the Lock and Archer app
 
-1. Deploy this PDS on Railway and note `PDS_HOSTNAME` (e.g. `https://lock-and-archer-pds.up.railway.app`).
-2. In the Lock and Archer app, sign in with a handle like `alice.lock-and-archer-pds.up.railway.app`.
+1. Deploy this PDS on Railway and note the hostname (e.g. `lock-and-archer-pds.up.railway.app` — the full URL is `https://` + that).
+2. In the Lock and Archer app, sign in with a handle that **exactly** matches your PDS hostname: `alice.<your-pds-hostname>` (e.g. `alice.lock-and-archer-pds-production.up.railway.app`).
 3. The app will resolve the handle to this PDS and use it for OAuth and for writing `xyz.statusphere.status` records. A self-hosted PDS allows custom lexicons (or `validate: false`), which avoids the “Unable to fulfill XRPC request” error you may see with bsky.social.
 
 ## Recreating test accounts

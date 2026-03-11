@@ -16,6 +16,8 @@ ENV PDS_DATA_DIRECTORY=/pds
 # Required: use disk for blobs (PDS errors without S3 or disk configured)
 ENV PDS_BLOBSTORE_DISK_LOCATION=/pds/blocks
 ENV PDS_PORT=3000
+# Allow signup from the Lock and Archer app without invite codes (test-friendly)
+ENV PDS_INVITE_REQUIRED=false
 
 # Railway sets PORT; PDS uses PDS_PORT
 EXPOSE 3000

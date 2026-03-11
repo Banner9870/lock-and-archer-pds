@@ -40,6 +40,8 @@ In the service **Variables** tab, set:
 | `PDS_ADMIN_PASSWORD` | `openssl rand -hex 16` (save it; you need it for goat and for re-running seed). |
 | `PDS_PLC_ROTATION_KEY_K256_PRIVATE_KEY_HEX` | Run: `openssl ecparam -name secp256k1 -genkey -noout -outform DER \| tail -c +8 \| head -c 32 \| xxd -p -c 32` |
 
+The image sets **`PDS_INVITE_REQUIRED=false`** so users can create accounts from the Lock and Archer app’s “Create account” flow without invite codes. To require invite codes instead, set **`PDS_INVITE_REQUIRED=true`** in Railway’s Variables (it overrides the Dockerfile default).
+
 **PDS_HOSTNAME rules (required or the app will crash with ZodError):**
 
 - Use **hostname only** — e.g. `lock-and-archer-pds-production.up.railway.app`. **Do not** include `https://` or any path; the PDS builds the issuer URL from this and full URLs cause "Domain name must contain at least two segments" and "Issuer URL must be in the canonical form".

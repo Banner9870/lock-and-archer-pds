@@ -91,8 +91,9 @@ If the Lock and Archer app shows **"Failed to resolve identity: alice.…"** whe
 ## Using this PDS from the Lock and Archer app
 
 1. Deploy this PDS on Railway and note the hostname (e.g. `lock-and-archer-pds.up.railway.app` — the full URL is `https://` + that).
-2. In the Lock and Archer app, sign in with a handle that **exactly** matches your PDS hostname: `alice.<your-pds-hostname>` (e.g. `alice.lock-and-archer-pds-production.up.railway.app`).
-3. The app will resolve the handle to this PDS and use it for OAuth and for writing `xyz.statusphere.status` records. A self-hosted PDS allows custom lexicons (or `validate: false`), which avoids the “Unable to fulfill XRPC request” error you may see with bsky.social.
+2. **In the Lock and Archer app**, set the `PDS_APP_URL` variable to your PDS full URL (e.g. `https://lock-and-archer-pds-production.up.railway.app`). That lets the app resolve handles via this PDS's XRPC so login works without wildcard DNS on Railway.
+3. Sign in with a handle that **exactly** matches your PDS hostname: `alice.<your-pds-hostname>` (e.g. `alice.lock-and-archer-pds-production.up.railway.app`).
+4. The app will use this PDS for OAuth and for writing `xyz.statusphere.status` records. A self-hosted PDS allows custom lexicons (or `validate: false`), which avoids the “Unable to fulfill XRPC request” error you may see with bsky.social.
 
 ## Recreating test accounts
 

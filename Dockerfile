@@ -13,6 +13,8 @@ RUN chmod +x /app/entrypoint.sh /app/seed-accounts.sh
 
 # PDS data directory (attach a Railway volume at /pds in the service settings)
 ENV PDS_DATA_DIRECTORY=/pds
+# Required: use disk for blobs (PDS errors without S3 or disk configured)
+ENV PDS_BLOBSTORE_DISK_LOCATION=/pds/blocks
 ENV PDS_PORT=3000
 
 # Railway sets PORT; PDS uses PDS_PORT

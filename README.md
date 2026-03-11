@@ -17,7 +17,7 @@ This image adds:
 
 ### 2. Add a volume
 
-PDS needs persistent storage for accounts and repo data.
+PDS needs persistent storage for accounts, repo data, and blobs. The Dockerfile configures **disk blobstore** at `/pds/blocks` (so the PDS won’t error with “Must configure either S3 or disk blobstore”).
 
 1. Open your service → **Settings** (or **Variables**).
 2. Click **Add Volume** (or **Attach Volume**).
